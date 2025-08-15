@@ -71,11 +71,6 @@ print("Day Counter: " .. tostring(dayCounter))
 -- Webhook Payload for Player Data
 local fields = {
     {
-        ["name"] = "[👤] Player Name",
-        ["value"] = '```' .. playerName .. '```',
-        ["inline"] = true
-    },
-    {
         ["name"] = "[💎] Diamond Count",
         ["value"] = '```' .. (diamondCount ~= "N/A" and diamondCount or "Not Found") .. '```',
         ["inline"] = true
