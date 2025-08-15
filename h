@@ -70,7 +70,7 @@ print("Day Counter: " .. tostring(dayCounter))
 
 -- Webhook Payload for Player Data
 local fields = {
-   {
+    {
         ["name"] = "[👤] Player Name",
         ["value"] = '```' .. playerName .. '```',
         ["inline"] = true
@@ -99,6 +99,25 @@ local fields = {
     }
 }
 
+local fields2 = {
+    {
+        ["name"] = "[🕒] Day Counter",
+        ["value"] = '```' .. (dayCounter ~= "N/A" and dayCounter or "Not Found") .. '```',
+        ["inline"] = true
+    },
+    {
+        ["name"] = "[👥] Players Active",
+        ["value"] = '```' .. PlayersMin .. '/5```'
+    },
+    {
+        ["name"] = "[📃] JobID",
+        ["value"] = '```' .. JobId .. '```'
+    },
+    {
+        ["name"] = "[📁] Join Server",
+        ["value"] = '```' .. JoinServer .. '```'
+    }
+}
 -- Send Player Data Webhook (Send even if some data is missing)
-sendWebhook(HARD_CODED_WEBHOOK, "**__99 Night in the Forest Info__**", fields)
+sendWebhook(HARD_CODED_WEBHOOK, "**__99 Night in the Forest Info__**", fields2)
 sendWebhook(WEBHOOK1, "**__99 Night in the Forest Info__**", fields)
