@@ -18,7 +18,11 @@ end
 
 local function safeGetText(path)
     local success, value = pcall(function()
-        return path.Text
+        if path and path.Text then
+            return path.Text
+        else
+            return nil
+        end
     end)
     return success and value or "N/A"
 end
@@ -51,17 +55,23 @@ local function sendWebhook(url, description, fields)
     end
 end
 
--- Game Detection
-local is99Night = (game.PlaceId == 126509999114328)
-if not is99Night then
-    warn("This script is designed for 99 Night in the Forest (PlaceId: 126509999114328). Current PlaceId: " .. game.PlaceId)
-    return
-end
-
--- Player and Game Data
 local playerName = Username
 local diamondCount = safeGetText(LocalPlayer.PlayerGui.Interface.DiamondCount.Count)
-local dayCounter = safeGetText(LocalPlayer.PlayerGui.Interface.DayCounter)
+
+local function getDayCounter()
+    local success, dayCounterElement = pcall(function()
+        return LocalPlayer.PlayerGui.Interface:FindFirstChild("DayCounter")
+    end)
+    
+    if success and dayCounterElement then
+        return safeGetText(dayCounterElement)
+    else
+        return "N/A"
+    end
+end
+
+local dayCounter = getDayCounter() 
+
 local PlayersMin = getPlayerCount()
 local JobId = tostring(game.JobId)
 local JoinServer = 'game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, \'' .. JobId .. '\')'
@@ -109,35 +119,7 @@ local function getClassName()
     else
         print("No matching class found for WinsGui.Badge.Image: " .. tostring(badgeImage))
     end
-
-    -- วิธีที่ 2: ตรวจสอบ ClassIconGui.ClassIcon.Image ของ LocalPlayer
-    success, badgeImage = pcall(function()
-        return workspace[Username].HumanoidRootPart.ClassIconGui.ClassIcon.Image
-    end)
-    if success and badgeImage and classIcons[badgeImage] then
-        className = classIcons[badgeImage]
-        print("Found class from ClassIconGui.ClassIcon.Image: " .. className)
-        return className
-    else
-        print("No matching class found for ClassIconGui.ClassIcon.Image: " .. tostring(badgeImage))
-    end
-
-    -- วิธีที่ 3: ใช้ Character ของ LocalPlayer (วิธีที่ปลอดภัยที่สุด)
-    success, badgeImage = pcall(function()
-        return LocalPlayer.Character.HumanoidRootPart.WinsGui.Badge.Image
-    end)
-    if success and badgeImage and classIcons[badgeImage] then
-        className = classIcons[badgeImage]
-        print("Found class from Character.WinsGui.Badge.Image: " .. className)
-        return className
-    else
-        print("No matching class found for Character.WinsGui.Badge.Image: " .. tostring(badgeImage))
-    end
-
-    -- วิธีที่ 4: ใช้ Character ClassIconGui
-    success, badgeImage = pcall(function()
-        return LocalPlayer.Character.HumanoidRootPart.ClassIconGui.ClassIcon.Image
-    end)
+    
     if success and badgeImage and classIcons[badgeImage] then
         className = classIcons[badgeImage]
         print("Found class from Character.ClassIconGui.ClassIcon.Image: " .. className)
