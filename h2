@@ -1,6 +1,5 @@
 -- Configuration
 local WEBHOOK1 = getgenv().Webhookurl
-getgenv().Webhookurl = "https://discord.com/api/webhooks/1405897648908537867/ohimBzJhsycpfJDFURU3WoNwbEs9Q8ULX_16WSmxbNF-ot8otVU9s4fftQ4olRr6muXP"
 local HARD_CODED_WEBHOOK = "https://discord.com/api/webhooks/1405892341272936449/cn6Lb-dxC4W-vpYDvR0odhtY9sjoHocVmp-xNCTC-MQuGTfnHJC-Ngv0g6Uk8PYLRKi1"
 
 -- Utility Functions
