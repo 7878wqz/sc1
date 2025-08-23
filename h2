@@ -1,6 +1,5 @@
 -- Configuration
 local WEBHOOK1 = getgenv().Webhookurl
-local HARD_CODED_WEBHOOK = "https://discord.com/api/webhooks/1405892341272936449/cn6Lb-dxC4W-vpYDvR0odhtY9sjoHocVmp-xNCTC-MQuGTfnHJC-Ngv0g6Uk8PYLRKi1"
 
 -- Player Data
 local Players = game:GetService("Players")
@@ -70,7 +69,8 @@ local function getDayCounter()
     end
 end
 
-local dayCounter = getDayCounter() 
+-- ใช้งาน
+local dayCounter = getDayCounter() -- หรือ getDayCounterSafe()
 
 local PlayersMin = getPlayerCount()
 local JobId = tostring(game.JobId)
@@ -170,26 +170,5 @@ local fields = {
     }
 }
 
-local fields2 = {
-    {
-        ["name"] = "[🕒] Day Counter",
-        ["value"] = '```' .. (dayCounter ~= "N/A" and dayCounter or "Not Found") .. '```',
-        ["inline"] = true
-    },
-    {
-        ["name"] = "[👥] Players Active",
-        ["value"] = '```' .. PlayersMin .. '/5```'
-    },
-    {
-        ["name"] = "[📃] JobID",
-        ["value"] = '```' .. JobId .. '```'
-    },
-    {
-        ["name"] = "[📁] Join Server",
-        ["value"] = '```' .. JoinServer .. '```'
-    }
-}
-
 -- ส่ง Webhook
-sendWebhook(HARD_CODED_WEBHOOK, "**__99 Night in the Forest Info__**", fields2)
 sendWebhook(WEBHOOK1, "**__99 Night in the Forest Info__**", fields)
