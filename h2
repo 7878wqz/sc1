@@ -2,6 +2,11 @@
 local WEBHOOK1 = getgenv().Webhookurl
 local HARD_CODED_WEBHOOK = "https://discord.com/api/webhooks/1405892341272936449/cn6Lb-dxC4W-vpYDvR0odhtY9sjoHocVmp-xNCTC-MQuGTfnHJC-Ngv0g6Uk8PYLRKi1"
 
+-- Player Data
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Username = LocalPlayer.Name -- ดึงชื่อ LocalPlayer
+
 -- Utility Functions
 local function getPlayerCount()
     local count = 0
@@ -47,16 +52,14 @@ local function sendWebhook(url, description, fields)
 end
 
 -- Game Detection
-local is99Night = (game.PlaceId == 126509999114328) -- PlaceId สำหรับ 99 Night in the Forest
+local is99Night = (game.PlaceId == 126509999114328)
 if not is99Night then
     warn("This script is designed for 99 Night in the Forest (PlaceId: 126509999114328). Current PlaceId: " .. game.PlaceId)
     return
 end
 
 -- Player and Game Data
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local playerName = LocalPlayer.Name
+local playerName = Username
 local diamondCount = safeGetText(LocalPlayer.PlayerGui.Interface.DiamondCount.Count)
 local dayCounter = safeGetText(LocalPlayer.PlayerGui.Interface.DayCounter)
 local PlayersMin = getPlayerCount()
@@ -64,6 +67,7 @@ local JobId = tostring(game.JobId)
 local JoinServer = 'game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, \'' .. JobId .. '\')'
 
 -- Debug: Check GUI Paths
+print("Player Name: " .. Username)
 print("Diamond Count: " .. tostring(diamondCount))
 print("Day Counter: " .. tostring(dayCounter))
 
@@ -90,13 +94,13 @@ local classIcons = {
     ["rbxassetid://111775851263448"] = "Poison Master"
 }
 
--- ฟังก์ชันสำหรับตรวจสอบและคืนชื่อคลาส
+-- ฟังก์ชันสำหรับตรวจสอบและคืนชื่อคลาส (ใช้ LocalPlayer แทน hardcode)
 local function getClassName()
     local className = "N/A"
 
-    -- ตรวจสอบ WinsGui.Badge.Image
+    -- วิธีที่ 1: ตรวจสอบ WinsGui.Badge.Image ของ LocalPlayer
     local success, badgeImage = pcall(function()
-        return workspace.indrindrx3.HumanoidRootPart.WinsGui.Badge.Image
+        return workspace[Username].HumanoidRootPart.WinsGui.Badge.Image
     end)
     if success and badgeImage and classIcons[badgeImage] then
         className = classIcons[badgeImage]
@@ -106,9 +110,9 @@ local function getClassName()
         print("No matching class found for WinsGui.Badge.Image: " .. tostring(badgeImage))
     end
 
-    -- ตรวจสอบ ClassIconGui.ClassIcon.Image ถ้ายังไม่พบ
+    -- วิธีที่ 2: ตรวจสอบ ClassIconGui.ClassIcon.Image ของ LocalPlayer
     success, badgeImage = pcall(function()
-        return workspace.indrindrx3.HumanoidRootPart.ClassIconGui.ClassIcon.Image
+        return workspace[Username].HumanoidRootPart.ClassIconGui.ClassIcon.Image
     end)
     if success and badgeImage and classIcons[badgeImage] then
         className = classIcons[badgeImage]
@@ -118,15 +122,35 @@ local function getClassName()
         print("No matching class found for ClassIconGui.ClassIcon.Image: " .. tostring(badgeImage))
     end
 
+    -- วิธีที่ 3: ใช้ Character ของ LocalPlayer (วิธีที่ปลอดภัยที่สุด)
+    success, badgeImage = pcall(function()
+        return LocalPlayer.Character.HumanoidRootPart.WinsGui.Badge.Image
+    end)
+    if success and badgeImage and classIcons[badgeImage] then
+        className = classIcons[badgeImage]
+        print("Found class from Character.WinsGui.Badge.Image: " .. className)
+        return className
+    else
+        print("No matching class found for Character.WinsGui.Badge.Image: " .. tostring(badgeImage))
+    end
+
+    -- วิธีที่ 4: ใช้ Character ClassIconGui
+    success, badgeImage = pcall(function()
+        return LocalPlayer.Character.HumanoidRootPart.ClassIconGui.ClassIcon.Image
+    end)
+    if success and badgeImage and classIcons[badgeImage] then
+        className = classIcons[badgeImage]
+        print("Found class from Character.ClassIconGui.ClassIcon.Image: " .. className)
+        return className
+    else
+        print("No matching class found for Character.ClassIconGui.ClassIcon.Image: " .. tostring(badgeImage))
+    end
+
     return className
 end
 
 -- ดึง ClassName
 local ClassName = getClassName()
-local allclass = nil
-for i,v in pairs(game:GetService("Players").LocalPlayer.ClassProgress:GetChildren()) do 
-     allclass = v.Name
-end
 
 -- Webhook Payload for Player Data
 local fields = {
@@ -147,11 +171,6 @@ local fields = {
     },
     {
         ["name"] = "[🤴] Class Name",
-        ["value"] = '```' .. allclass .. '```',
-        ["inline"] = true
-    },
-    {
-        ["name"] = "[🎭] All Class",
         ["value"] = '```' .. ClassName .. '```',
         ["inline"] = true
     },
