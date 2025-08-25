@@ -290,20 +290,40 @@ local cachedQuestData = nil
 local lastQuestCheck = 0
 local QUEST_CACHE_DURATION = 2
 
+function getMobCFrame(mobName)
+    if not mobName then return {} end
+    
+    local matchingCFrames = {}
+    -- ใช้ gsub เพื่อลบตัวเลขและวงเล็บเหลี่ยมออกจากชื่อมอนสเตอร์
+    local result = string.gsub(mobName, "Lv. ", "")
+    local result2 = string.gsub(result, "[%[%]]", "")
+    local result3 = string.gsub(result2, "%d+", "")
+    local result4 = string.gsub(result3, "%s+", "")
+    
+    for i,v in pairs(Workspace.EnemySpawns:GetChildren()) do
+        -- ใช้ string.find แบบไม่ใช้ pattern เพื่อความแม่นยำ
+        if v.Name:find(result4, 1, true) then
+            table.insert(matchingCFrames, v.CFrame)
+        end
+    end
+    
+    return matchingCFrames
+end
+
 local function QuestCheck()
     local currentTime = tick()
     
-    -- Use cached data if still valid
+    -- ใช้ข้อมูลที่แคชไว้หากยังใช้ได้
     if cachedQuestData and (currentTime - lastQuestCheck) < QUEST_CACHE_DURATION then
         return cachedQuestData
     end
     
     local Lvl = LocalPlayer.Data.Level.Value
     
-    -- Clear previous values
+    -- ล้างค่าเก่า
     local MobName, QuestName, QuestLevel, Mon, NPCPosition, LevelRequire, MobCFrame
     
-    -- Handle low levels efficiently
+    -- เควสต์เลเวลต่ำ
     if Lvl >= 1 and Lvl <= 9 then
         if tostring(LocalPlayer.Team) == "Marines" then
             MobName = "Trainee"
@@ -332,7 +352,7 @@ local function QuestCheck()
         return cachedQuestData
     end
 
-    -- Fixed Prisoner Quest Level 1
+    -- Prisoner Quest Level 1
     if Lvl >= 190 and Lvl <= 209 then
         MobName = "Prisoner"
         QuestName = "PrisonerQuest"
@@ -354,7 +374,7 @@ local function QuestCheck()
         return cachedQuestData
     end
 
-    -- Dangerous Prisoner for higher levels
+    -- Dangerous Prisoner
     if Lvl >= 210 and Lvl <= 249 then
         MobName = "Dangerous Prisoner"
         QuestName = "PrisonerQuest"
@@ -376,7 +396,6 @@ local function QuestCheck()
         return cachedQuestData
     end
     
-    -- Continue with original quest logic but optimized
     local GuideModule = require(ReplicatedStorage.GuideModule)
     local Quests = require(ReplicatedStorage.Quests)
     
@@ -400,14 +419,12 @@ local function QuestCheck()
         end
     end
     
-    -- Fishman area teleportation
     if Lvl >= 375 and Lvl <= 449 then
         if _G.AutoFarm and NPCPosition and (NPCPosition.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 3000 then
             ReplicatedStorage.Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(61163.8515625, 11.6796875, 1819.7841796875))
         end
     end
 
-    -- Get quest information
     for i,v in pairs(Quests) do
         for i1,v1 in pairs(v) do
             if v1["LevelReq"] == LevelRequire and i ~= "CitizenQuest" then
@@ -420,7 +437,6 @@ local function QuestCheck()
         end
     end
     
-    -- Handle special cases
     if QuestName == "MarineQuest2" then
         QuestName = "MarineQuest2"
         QuestLevel = 1
@@ -448,68 +464,68 @@ local function QuestCheck()
         LevelRequire = 775
 
     elseif QuestName == "TikiQuest1" and QuestLevel == 1 then
-            QuestLevel = 1
-            MobName = "Isle Outlaw"
-            Mon = "Isle Outlaw"
-            LevelRequire = 2450
+        QuestLevel = 1
+        MobName = "Isle Outlaw"
+        Mon = "Isle Outlaw"
+        LevelRequire = 2450
     elseif QuestName == "TikiQuest1" and QuestLevel == 2 then
-            QuestLevel = 2
-            MobName = "Island Boy"
-            Mon = "Island Boy"
-            LevelRequire = 2475
-    elseif QuestName == "TikiQuest2" and QuestLevel == 1 then
-            QuestLevel = 1
-            MobName = "Sun-kissed Warrior"
-            Mon = "Sun-kissed Warrior"
-            LevelRequire = 2500
+        QuestLevel = 2
+        MobName = "Island Boy"
+        Mon = "Island Boy"
+        LevelRequire = 2475
+    --[[elseif QuestName == "TikiQuest2" and QuestLevel == 1 then
+        QuestLevel = 1
+        MobName = "Sun-kissed Warrior"
+        Mon = "Sun-kissed Warrior"
+        LevelRequire = 2500
     elseif QuestName == "TikiQuest2" and QuestLevel == 2 then
-            QuestLevel = 2
-            MobName = "Isle Champion"
-            Mon = "Isle Championr"
-            LevelRequire = 2525
+        QuestLevel = 2
+        MobName = "Isle Champion"
+        Mon = "Isle Championr"
+        LevelRequire = 2525]]
     elseif QuestName == "TikiQuest3" and QuestLevel == 1 then
-            QuestLevel = 1
-            MobName = "Serpent Hunter"
-            Mon = "Serpent Hunter"
-            LevelRequire = 2550
+        QuestLevel = 1
+        MobName = "Serpent Hunter"
+        Mon = "Serpent Hunter"
+        LevelRequire = 2550
     elseif QuestName == "TikiQuest3" and QuestLevel == 2 then
-            QuestLevel = 2
-            MobName = "Skull Slayer"
-            Mon = "Skull Slayer"
-            LevelRequire = 2575
+        QuestLevel = 2
+        MobName = "Skull Slayer"
+        Mon = "Skull Slayer"
+        LevelRequire = 2575
     elseif QuestName == "SubmergedQuest1" and QuestLevel == 1 then
-            QuestLevel = 1 
-            MobName = "Reef Bandit"
-            Mon = "Reef Bandit"
-            LevelRequire = 2600
+        QuestLevel = 1 
+        MobName = "Reef Bandit"
+        Mon = "Reef Bandit"
+        LevelRequire = 2600
     elseif QuestName == "SubmergedQuest1" and QuestLevel == 2 then
-            QuestLevel = 2
-            MobName = "Coral Pirate"
-            Mon = "Coral Pirate"
-            LevelRequire = 2625
-     elseif QuestName == "SubmergedQuest2" and QuestLevel == 1 then
-            QuestLevel = 1 
-            MobName = "Sea Chanter"
-            Mon = "Sea Chanter"
-            LevelRequire = 2650
+        QuestLevel = 2
+        MobName = "Coral Pirate"
+        Mon = "Coral Pirate"
+        LevelRequire = 2625
+    elseif QuestName == "SubmergedQuest2" and QuestLevel == 1 then
+        QuestLevel = 1 
+        MobName = "Sea Chanter"
+        Mon = "Sea Chanter"
+        LevelRequire = 2650
     elseif QuestName == "SubmergedQuest2" and QuestLevel == 2 then
-            QuestLevel = 2
-            MobName = "Ocean Prophet"
-            Mon = "Ocean Prophet"
-            LevelRequire = 2675
+        QuestLevel = 2
+        MobName = "Ocean Prophet"
+        Mon = "Ocean Prophet"
+        LevelRequire = 2675
     end
     
     -- Optimize mob name finding
     if MobName then
-        MobName = MobName:sub(1,#MobName)
-        if not MobName:find("Lv") then
-            -- Check workspace enemies first
-            for i,v in pairs(Workspace.Enemies:GetChildren()) do
-                local MonLV = string.match(v.Name, "%d+")
-                if v.Name:find(MobName) and #v.Name > #MobName and MonLV and tonumber(MonLV) <= Lvl + 50 then
-                    MobName = v.Name
-                    break -- Exit early when found
-                end
+        local CleanMobName = string.gsub(MobName, " [Lv. %d+]", "") -- ลบส่วนเลเวลออก
+        
+        -- Check workspace enemies first
+        for i,v in pairs(Workspace.Enemies:GetChildren()) do
+            local MonLV = string.match(v.Name, "%d+")
+            -- ใช้ string.find แบบไม่ใช้ pattern matching
+            if v.Name:find(CleanMobName, 1, true) and MonLV and tonumber(MonLV) <= Lvl + 50 then
+                MobName = v.Name
+                break -- Exit early when found
             end
         end
         
@@ -517,7 +533,7 @@ local function QuestCheck()
         if not MobName:find("Lv") then
             for i,v in pairs(ReplicatedStorage:GetChildren()) do
                 local MonLV = string.match(v.Name, "%d+")
-                if v.Name:find(MobName) and #v.Name > #MobName and MonLV and tonumber(MonLV) <= Lvl + 50 then
+                if v.Name:find(CleanMobName, 1, true) and MonLV and tonumber(MonLV) <= Lvl + 50 then
                     MobName = v.Name
                     Mon = v.Name
                     break -- Exit early when found
@@ -544,24 +560,6 @@ local function QuestCheck()
     return cachedQuestData
 end
 
--- Optimized function to get mob CFrame
-function getMobCFrame(mobName)
-    if not mobName then return {} end
-    
-    local matchingCFrames = {}
-    local result = string.gsub(mobName, "Lv. ", "")
-    local result2 = string.gsub(result, "[%[%]]", "")
-    local result3 = string.gsub(result2, "%d+", "")
-    local result4 = string.gsub(result3, "%s+", "")
-    
-    for i,v in pairs(Workspace.EnemySpawns:GetChildren()) do
-        if v.Name == result4 then
-            table.insert(matchingCFrames, v.CFrame)
-        end
-    end
-    
-    return matchingCFrames
-end
 --velocity
 spawn(function()
     pcall(function()
@@ -860,7 +858,9 @@ local function toTarget(...)
     if not GlobalEnv.hasRotated and Distance >= 200 then
         Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 180, 0)
         GlobalEnv.hasRotated = true
-       
+    elseif not GlobalEnv.hasRotated and Distance <= 199 then
+        Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0)
+        GlobalEnv.hasRotated = true
     end
 
     if Distance < 5 then
@@ -889,9 +889,10 @@ local function toTarget(...)
         Speed = 250
         local currentPos = playerPos
         local newY = currentPos.Y + 180
-        RealTarget = CFrame.new(RealTarget.Position.X, newY, RealTarget.Position.Z)
+        RealTarget = CFrame.new(RealTarget.Position.X,Players.LocalPlayer.Character.HumanoidRootPart.Position.Y,RealTarget.Position.Z)
     end 
 
+    
     local info = TweenInfo.new(
         Distance / Speed, 
         Enum.EasingStyle.Linear
@@ -1247,6 +1248,111 @@ page1:Toggle("AutoFarmLevel\nออโต้ฟาร์มเลเวล", _G.
     end
 end)  
 
+spawn(function()
+    while task.wait() do
+        local MyLevel = game.Players.LocalPlayer.Data.Level.Value
+        local QuestC = game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest
+        pcall(function()
+            if _G.AutoFarm then  
+                local questData = QuestCheck()
+                if QuestC.Visible == true then
+                    local targetMobName = questData[3]
+                    local foundMob = nil
+                    
+                    -- ค้นหามอนสเตอร์ที่มีชื่อคล้ายกัน
+                    for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                        -- ใช้ string.find ที่ยืดหยุ่นขึ้น
+                        if string.find(v.Name, targetMobName, 1, true) or string.find(targetMobName, v.Name, 1, true) then
+                            foundMob = v
+                            break
+                        end
+                    end
+                    
+                    if foundMob and foundMob:FindFirstChild("Humanoid") and foundMob:FindFirstChild("HumanoidRootPart") and foundMob.Humanoid.Health > 0 then
+                        local v = foundMob
+                        repeat task.wait()
+                            if _G.Auto_CFrame then
+                                SetCFarme = 1
+                            end
+                            
+                            -- ตรวจสอบว่าเควสต์ปัจจุบันยังตรงกับที่ตั้งค่าไว้หรือไม่
+                            if not string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, questData[6], 1, true) then
+                                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
+                            else
+                                PosMon = v.HumanoidRootPart.CFrame
+                                v.HumanoidRootPart.Size = Vector3.new(60,60,60)
+                                v.HumanoidRootPart.CanCollide = false
+                                v.Humanoid.WalkSpeed = 0
+                                v.Head.CanCollide = false
+                                _G.BringMob = true
+                                EquipWeapon(_G.SelectWeapon)
+                                v.HumanoidRootPart.Transparency = 1
+                                toTarget(v.HumanoidRootPart.CFrame * MethodFarm)
+                            end
+                        until not _G.AutoFarm or not v.Parent or v.Humanoid.Health < 1 or QuestC.Visible == false or not v:FindFirstChild("HumanoidRootPart")
+                    else
+                        if _G.Auto_CFrame and not _G.AutoFarmFast then
+                            if questData[7] and questData[7][SetCFarme] then
+                                toTarget(questData[7][SetCFarme] * MethodFarm)
+                                if (questData[7][SetCFarme].Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 50 then
+                                    if SetCFarme == nil or SetCFarme == '' then
+                                        SetCFarme = 1
+                                    elseif SetCFarme >= #questData[7] then
+                                        SetCFarme = 1
+                                    end
+                                    SetCFarme =  SetCFarme + 1
+                                    wait(0.5)
+                                end
+                            end
+                        else
+                            if not _G.AutoFarmFast and questData[7] and questData[7][1] then
+                                if AttackRandomType_MonCFrame == 1 then
+                                    toTarget(questData[7][1] * CFrame.new(0,30,20))
+                                elseif AttackRandomType_MonCFrame == 2 then
+                                    toTarget(questData[7][1] * CFrame.new(0,30,-20))
+                                elseif AttackRandomType_MonCFrame == 3 then
+                                    toTarget(questData[7][1] * CFrame.new(20,30,0))
+                                elseif AttackRandomType_MonCFrame == 4 then
+                                    toTarget(questData[7][1] * CFrame.new(0,30,-20))
+                                elseif AttackRandomType_MonCFrame == 5 then
+                                    toTarget(questData[7][1] * CFrame.new(-20,30,0))
+                                else
+                                    toTarget(questData[7][1] * CFrame.new(0,30,20))
+                                end
+                            end
+                        end
+                    end
+                else
+                    if questData[2] then
+                        toTarget(questData[2])
+                        if (questData[2].Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 1 then
+                            _G.BringMob = false
+                            wait(0.2)
+                            game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer("StartQuest", questData[4], questData[1]) wait(0.5)
+                            if questData[7] and questData[7][1] then
+                                toTarget(questData[7][1] * MethodFarm)
+                                if AttackRandomType_MonCFrame == 1 then
+                                    toTarget(questData[7][1] * CFrame.new(0,30,20))
+                                elseif AttackRandomType_MonCFrame == 2 then 
+                                    toTarget(questData[7][1] * CFrame.new(0,30 ,-20))
+                                elseif AttackRandomType_MonCFrame == 3 then
+                                    toTarget(questData[7][1] * CFrame.new(20,30 ,0))
+                                elseif AttackRandomType_MonCFrame == 4 then
+                                    toTarget(questData[7][1] * CFrame.new(0,30 ,-20))
+                                elseif AttackRandomType_MonCFrame == 5 then
+                                    toTarget(questData[7][1] * CFrame.new(-20,30 ,0))
+                                else
+                                    toTarget(questData[7][1] * CFrame.new(0,30 ,20))
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
 page1:Toggle("SafeMode\nเซฟโหมด", _G.Settings.SafeMode, function(value)
 _G.SafeMode = value
 _G.Settings.SafeMode = value
@@ -1318,105 +1424,6 @@ spawn(function()
     end
 end)
             
-     
-
-AttackRandomType_MonCFrame = 1
-spawn(function()
-    while wait() do 
-        AttackRandomType_MonCFrame = math.random(1,5)
-        wait(0.2)
-    end
-end)     
-_G.Auto_CFrame = true
-local SetCFarme = 1
-spawn(function()
-    while task.wait() do
-        local MyLevel = game.Players.LocalPlayer.Data.Level.Value
-        local QuestC = game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest
-        pcall(function()
-            if _G.AutoFarm then  
-                if QuestC.Visible == true then
-                    if game:GetService("Workspace").Enemies:FindFirstChild(QuestCheck()[3]) then
-                        for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                            if v.Name == QuestCheck()[3] then
-                                if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
-                                    repeat task.wait()
-                                        if _G.Auto_CFrame then
-                                            SetCFarme = 1
-                                        end
-                                        if not string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, QuestCheck()[6]) then
-                                            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
-                                        else
-                                            PosMon = v.HumanoidRootPart.CFrame
-                                            v.HumanoidRootPart.Size = Vector3.new(60,60,60)
-                                            v.HumanoidRootPart.CanCollide = false
-                                            v.Humanoid.WalkSpeed = 0
-                                            v.Head.CanCollide = false
-                                            _G.BringMob = true
-                                            EquipWeapon(_G.SelectWeapon)
-                                            v.HumanoidRootPart.Transparency = 1
-                                            toTarget(v.HumanoidRootPart.CFrame * MethodFarm)
-                                        end
-                                    until not _G.AutoFarm or not v.Parent or v.Humanoid.Health < 1 or QuestC.Visible == false or not v:FindFirstChild("HumanoidRootPart")
-                                end
-                            end
-                        end
-                    else
-                        if _G.Auto_CFrame and not _G.AutoFarmFast then
-                            toTarget(QuestCheck()[7][SetCFarme] * MethodFarm)
-                            if (QuestCheck()[7][SetCFarme].Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 50 then
-                                if SetCFarme == nil or SetCFarme == '' then
-                                    SetCFarme = 1
-                                elseif SetCFarme >= #QuestCheck()[7] then
-                                    SetCFarme = 1
-                                end
-                                SetCFarme =  SetCFarme + 1
-                                wait(0.5)
-                            end
-                        else
-                            if not _G.AutoFarmFast then
-                                if AttackRandomType_MonCFrame == 1 then
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(0,30,20))
-                                elseif AttackRandomType_MonCFrame == 2 then
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(0,30,-20))
-                                elseif AttackRandomType_MonCFrame == 3 then
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(20,30,0))
-                                elseif AttackRandomType_MonCFrame == 4 then
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(0,30,-20))
-                                elseif AttackRandomType_MonCFrame == 5 then
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(-20,30,0))
-                                else
-                                    toTarget(QuestCheck()[7][1] * CFrame.new(0,30,20))
-                                end
-                            end
-                        end
-                    end
-                else
-                    toTarget(QuestCheck()[2])
-                    if (QuestCheck()[2].Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 1 then
-                        _G.BringMob = false
-                        wait(0.2)
-                        game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer("StartQuest", QuestCheck()[4], QuestCheck()[1]) wait(0.5)
-                        toTarget(QuestCheck()[7][1] * MethodFarm)
-                        if AttackRandomType_MonCFrame == 1 then
-                            toTarget(QuestCheck()[7][1] * CFrame.new(0,30,20))
-                        elseif AttackRandomType_MonCFrame == 2 then 
-                            toTarget(QuestCheck()[7][1] * CFrame.new(0,30 ,-20))
-                        elseif AttackRandomType_MonCFrame == 3 then
-                            toTarget(QuestCheck()[7][1] * CFrame.new(20,30 ,0))
-                        elseif AttackRandomType_MonCFrame == 4 then
-                            toTarget(QuestCheck()[7][1] * CFrame.new(0,30 ,-20))
-                        elseif AttackRandomType_MonCFrame == 5 then
-                            toTarget(QuestCheck()[7][1] * CFrame.new(-20,30 ,0))
-                        else
-                            toTarget(QuestCheck()[7][1] * CFrame.new(0,30 ,20))
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end)
     
     page1:Seperator("Chest/กล่อง")
     page1:Toggle("Auto Farm Chest [Tween]\nฟาร์มกล่อง [บินเก็บ]", _G.Settings.AutoFarmChest, function(value)
