@@ -1,7 +1,7 @@
 local function sendJobIdWebhook()
     local JobId = tostring(game.JobId) or "N/A"
     local playerCount = #game:GetService("Players"):GetPlayers() -- Get the number of players
-    local message = "!jobid:" .. JobId .. " !Players:" .. playerCount -- Format message as requested
+    local message = "!jobid:" .. JobId .. " \n!Players:" .. playerCount -- Format message as requested
     local data = {
         ["content"] = message
     }
