@@ -1,12 +1,10 @@
-
 local function sendJobIdWebhook()
     local JobId = tostring(game.JobId) or "N/A"
-    local message = "!jobid:" .. JobId -- 👈 ส่งข้อความแบบนี้เลย
-
+    local playerCount = #game:GetService("Players"):GetPlayers() -- Get the number of players
+    local message = "!jobid:" .. JobId .. " !Players:" .. playerCount -- Format message as requested
     local data = {
         ["content"] = message
     }
-
     local newdata = game:GetService("HttpService"):JSONEncode(data)
     local headers = { ["content-type"] = "application/json" }
     local request = http_request or request or HttpPost or syn.request or http.request
@@ -18,7 +16,7 @@ local function sendJobIdWebhook()
             Method = "POST",
             Headers = headers
         })
-        print("ส่ง JobId ไปที่ Webhook แล้ว:", message)
+        print("ส่ง JobId และจำนวนผู้เล่นไปที่ Webhook แล้ว:", message)
     else
         warn("No request function available!")
     end
