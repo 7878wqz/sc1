@@ -1,0 +1,216 @@
+
+local GlobalEnv = (getgenv or getrenv or getfenv)()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlayersService = game:GetService("Players")
+local LocalPlayer = PlayersService.LocalPlayer
+local GameModules = ReplicatedStorage:WaitForChild("Modules")
+local Network = require(GameModules:WaitForChild("Net")) 
+local CharactersFolder = workspace:WaitForChild("Characters")
+local EnemiesFolder = workspace:WaitForChild("Enemies")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+if _G.Fatk == nil then _G.Fatk = true end
+local AttackSystem = {
+    LastAttackTime = tick()
+}
+
+function AttackSystem.IsTargetAlive(Target)
+    if not Target then return false end
+    local Humanoid = Target:FindFirstChildOfClass("Humanoid")
+    if Humanoid then
+        return Humanoid.Health > 0
+    end
+    return false
+end
+
+local Config = {
+    EnableAutoAttack = true,
+    AllowedWeaponTypes = {"Melee", "Sword", "Blox Fruit"} -- เพิ่มประเภทอาวุธที่อนุญาต
+}
+
+local function HasValidWeapon()
+    if not LocalPlayer.Character then return false end
+    for _, item in ipairs(LocalPlayer.Character:GetChildren()) do
+        if item:IsA("Tool") then
+            local toolTip = string.lower(item.ToolTip or "")
+            local toolName = string.lower(item.Name)
+            
+            if string.find(toolTip, "blox fruit") or string.find(toolTip, "devil fruit") or string.find(toolTip, "fruit") or string.find(toolName, "fruit") then
+                return true, item, "Blox Fruit", 1000
+            end
+            if string.find(toolTip, "sword") or string.find(toolTip, "blade") or string.find(toolTip, "katana") or string.find(toolTip, "cutlass") or string.find(toolName, "sword") or string.find(toolName, "blade") then
+                return true, item, "Sword", 2000
+            end
+            if string.find(toolTip, "melee") or string.find(toolTip, "fist") or string.find(toolTip, "combat") or string.find(toolTip, "fighting") or string.find(toolName, "combat") or string.find(toolName, "fighting") then
+                return true, item, "Melee", 1000
+            end
+        end
+    end
+    return false
+end
+
+AttackSystem.FastAttackHandler = (function()
+    if GlobalEnv._cached_attack then return GlobalEnv._cached_attack end
+
+    local AttackHandler = {
+        AttackRange = 300, -- ค่าเริ่มต้น
+        TargetMobs = true,
+        TargetPlayers = true,
+        HasAttackedBefore = false
+    }
+
+    local function getNetworkEvent(eventName)
+        local success, event = pcall(function()
+            return Network:RemoteEvent(eventName)
+        end)
+        if success then
+            return event
+        else
+            return nil
+        end
+    end
+
+    local possibleEvents = {
+        "RegisterHit",
+        "Hit", 
+        "Attack",
+        "RegisterAttack",
+        "PlayerHit",
+        "DamagePlayer"
+    }
+
+    local HitEvent = nil
+    local AttackEvent = nil
+
+    for _, eventName in ipairs(possibleEvents) do
+        HitEvent = getNetworkEvent(eventName)
+        if HitEvent then break end
+    end
+
+    AttackEvent = getNetworkEvent("RegisterAttack")
+
+    if not HitEvent then
+        local searchFolders = {
+            ReplicatedStorage:WaitForChild("FX"),
+            ReplicatedStorage:WaitForChild("Util"), 
+            ReplicatedStorage:WaitForChild("Remotes"),
+            ReplicatedStorage:WaitForChild("Common"),
+            Lighting,
+            ReplicatedStorage:WaitForChild("Assets")
+        }
+        
+        for _, folder in pairs(searchFolders) do
+            for _, child in pairs(folder:GetChildren()) do
+                local id = child:GetAttribute("Id")
+                if id and id >= 1 and id <= 10000 then
+                    HitEvent = child
+                    break
+                end
+            end
+            if HitEvent then break end
+        end
+    end
+
+    if not HitEvent then
+        error("ไม่สามารถหา HitEvent ได้")
+    end
+
+    local attackArgs = {
+        "HitTarget"
+    }
+
+    function AttackHandler:AttackTarget(TargetRoot, AttackData)
+        if not TargetRoot then return end
+        
+        local distance = LocalPlayer:DistanceFromCharacter(TargetRoot.Position)
+        if distance >= self.AttackRange then
+           -- print("Target too far:", TargetRoot.Parent.Name, "Distance:", distance, "Range:", self.AttackRange)
+            return
+        end
+
+        if AttackEvent and not self.HasAttackedBefore then
+            pcall(function() 
+                AttackEvent:FireServer(-math.huge)
+            end)
+            self.HasAttackedBefore = true
+        end
+
+        local randomArg = attackArgs[math.random(1, #attackArgs)]
+        local attackData = AttackData or {}
+        
+        pcall(function() 
+            HitEvent:FireServer(TargetRoot, attackData, nil, randomArg)
+           -- print("Attack sent (method 1):", randomArg, "to", TargetRoot.Parent.Name)
+        end)
+    end
+
+    function AttackHandler:AttackClosestTarget()
+        -- ตรวจสอบอาวุธก่อนโจมตี
+        local hasWeapon, weapon, weaponType, range = HasValidWeapon()
+        if not hasWeapon then
+           -- print("No valid weapon, stopping attack")
+            return
+        end
+        
+        -- ปรับ AttackRange ตามประเภทอาวุธ
+        AttackHandler.AttackRange = range or AttackHandler.AttackRange
+       -- print("Using weapon:", weaponType, "with AttackRange:", AttackHandler.AttackRange)
+
+        local TargetData = {nil, {}}
+
+        for _, Mob in pairs(EnemiesFolder:GetChildren()) do
+            if AttackSystem.IsTargetAlive(Mob) then
+                local MobRootPart = Mob:FindFirstChild("HumanoidRootPart", true)
+                if MobRootPart and LocalPlayer:DistanceFromCharacter(MobRootPart.Position) < self.AttackRange then
+                    if not TargetData[1] then
+                        TargetData[1] = MobRootPart
+                    else
+                        table.insert(TargetData[2], {
+                            [1] = Mob,
+                            [2] = MobRootPart
+                        })
+                    end
+                end
+            end
+        end
+
+        if TargetData[1] then
+            self:AttackTarget(TargetData[1], TargetData[2])
+        end
+
+        if self.TargetPlayers then
+            for _, Character in pairs(CharactersFolder:GetChildren()) do
+                if Character ~= LocalPlayer.Character and AttackSystem.IsTargetAlive(Character) then
+                    local CharacterRootPart = Character:FindFirstChild("HumanoidRootPart")
+                    if CharacterRootPart then
+                        self:AttackTarget(CharacterRootPart)
+                    end
+                end
+            end
+        end
+    end
+
+function AttackHandler:PerformAttack()
+    if not _G.Fatk then return end 
+    self:AttackClosestTarget()
+    self.HasAttackedBefore = false
+end
+
+task.spawn(function()
+    while task.wait(0) do -- ลด wait เพื่อไม่กิน CPU
+        if _G.Fatk then
+            AttackHandler:PerformAttack()
+        end
+    end
+end)
+
+    --[[task.spawn(function()
+        local script = GameModules.Net
+        for _, child in pairs(script:GetChildren()) do
+         --   print("Net child:", child.Name, child.ClassName, child:GetAttribute("Id"))
+        end
+    end)]]
+
+    GlobalEnv._cached_attack = AttackHandler
+    return AttackHandler
+end)()
