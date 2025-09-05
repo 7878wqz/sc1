@@ -1,0 +1,1292 @@
+repeat wait() until game:IsLoaded() 
+_G.FarmChest = true
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local GuiService = game:GetService("GuiService")
+local StarterGui = game:GetService("StarterGui")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local player = Players.LocalPlayer
+HttpService.HttpEnabled = true
+--รอเช็ค
+local lp = Players.LocalPlayer
+while not lp do
+    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+    lp = Players.LocalPlayer
+end
+
+while not Players.LocalPlayer or not Players.LocalPlayer:FindFirstChild("PlayerGui") do
+    task.wait()
+end
+
+local ss = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Credit")
+if ss then 
+ss:Destroy()
+end
+local Credit = Instance.new("ScreenGui")
+local CreditFrame = Instance.new("Frame")
+local CreditText = Instance.new("TextLabel")
+local Username = Instance.new("TextLabel")
+local DiamondAmout = Instance.new("TextLabel")
+local TimeServer = Instance.new("TextLabel")
+local RejoinServerButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+
+local UICorner_2 = Instance.new("UICorner")
+local DiscordLink = Instance.new("ImageButton")
+local TextDIscordLink = Instance.new("TextLabel")
+
+--Properties:
+
+Credit.Name = "Credit"
+Credit.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Credit.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+CreditFrame.Name = "CreditFrame"
+CreditFrame.Parent = Credit
+CreditFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+CreditFrame.BackgroundTransparency = 1
+CreditFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CreditFrame.BorderSizePixel = 0
+CreditFrame.Size = UDim2.new(1, 0, 1, 0)
+
+CreditText.Name = "CreditText"
+CreditText.Parent = CreditFrame
+CreditText.AnchorPoint = Vector2.new(0.5, 0.5)
+CreditText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CreditText.BackgroundTransparency = 1.000
+CreditText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CreditText.BorderSizePixel = 0
+CreditText.Position = UDim2.new(0.49947089, 0, 0.5, 0)
+CreditText.Size = UDim2.new(0, 200, 0, 50)
+CreditText.Font = Enum.Font.Arcade 
+CreditText.Text = "!:Vector Hub Farm Diamond:!"
+CreditText.TextColor3 = Color3.fromRGB(6, 6, 255)
+CreditText.TextSize = 44.000
+CreditText.TextStrokeTransparency = 0.200
+
+Username.Name = "Username"
+Username.Parent = CreditText
+Username.AnchorPoint = Vector2.new(0.5, 0.5)
+Username.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Username.BackgroundTransparency = 1.000
+Username.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Username.BorderSizePixel = 0
+Username.Position = UDim2.new(0.5, 0, 1.12, 0)
+Username.Size = UDim2.new(0, 200, 0, 50)
+Username.Font = Enum.Font.Arcade
+Username.Text = "Username:" .. game.Players.LocalPlayer.Name
+Username.TextColor3 = Color3.fromRGB(255, 4, 4)
+Username.TextSize = 30.000
+Username.TextStrokeTransparency = 0.200
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local diamonds = LocalPlayer:GetAttribute("Diamonds")
+
+DiamondAmout.Name = "DiamondAmout"
+DiamondAmout.Parent = CreditText
+DiamondAmout.AnchorPoint = Vector2.new(0.5, 0.5)
+DiamondAmout.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DiamondAmout.BackgroundTransparency = 1.000
+DiamondAmout.BorderColor3 = Color3.fromRGB(0, 0, 0)
+DiamondAmout.BorderSizePixel = 0
+DiamondAmout.Position = UDim2.new(0.5, 0, 1.67999995, 0)
+DiamondAmout.Size = UDim2.new(0, 200, 0, 50)
+DiamondAmout.Font = Enum.Font.Arcade
+local Players = game:GetService("Players")
+
+
+-- รอ UI ทีละชั้น (มี timeout กันวนรอเกินไป)
+local pg = lp:WaitForChild("PlayerGui")
+local interface = pg:WaitForChild("Interface", 10)
+local diamondCount = interface and interface:WaitForChild("DiamondCount", 10)
+local countLabel = diamondCount and diamondCount:WaitForChild("Count", 10)
+
+if countLabel then
+    DiamondAmout.Text = "Diamond: " .. countLabel.Text
+    -- อัพเดทตาม UI ตลอด
+    countLabel:GetPropertyChangedSignal("Text"):Connect(function()
+        DiamondAmout.Text = "Diamond: " .. countLabel.Text
+    end)
+else
+    DiamondAmout.Text = "Diamond: Loading..."
+end
+
+DiamondAmout.TextColor3 = Color3.fromRGB(0, 229, 255)
+DiamondAmout.TextSize = 30.000
+DiamondAmout.TextStrokeTransparency = 0.200
+
+TimeServer.Name = "TimeServer"
+TimeServer.Parent = CreditText
+TimeServer.AnchorPoint = Vector2.new(0.5, 0.5)
+TimeServer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TimeServer.BackgroundTransparency = 1.000
+TimeServer.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TimeServer.BorderSizePixel = 0
+TimeServer.Position = UDim2.new(0.5, 0, 2.25999999, 0)
+TimeServer.Size = UDim2.new(0, 200, 0, 50)
+TimeServer.Font = Enum.Font.Arcade
+    function UpdateTime()
+    local GameTime = math.floor(workspace.DistributedGameTime+0.5)
+    local Hour = math.floor(GameTime/(60^2))%24
+    local Minute = math.floor(GameTime/(60^1))%60
+    local Second = math.floor(GameTime/(60^0))%60
+    TimeServer.Text = " Hour : "..Hour.." Minute : "..Minute.." Second : "..Second
+    end
+TimeServer.TextColor3 = Color3.fromRGB(6, 255, 6)
+TimeServer.TextSize = 30.000
+TimeServer.TextStrokeTransparency = 0.200
+
+
+    
+    spawn(function()
+        while task.wait() do
+            pcall(function()
+            UpdateTime()
+            end)
+        end
+    end)
+
+RejoinServerButton.Name = "RejoinServerButton"
+RejoinServerButton.Parent = CreditText
+RejoinServerButton.AnchorPoint = Vector2.new(0.5, 0.5)
+RejoinServerButton.BackgroundColor3 = Color3.fromRGB(255, 0, 4)
+RejoinServerButton.BackgroundTransparency = 0.300
+RejoinServerButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RejoinServerButton.BorderSizePixel = 5
+RejoinServerButton.BorderMode = "Middle"
+RejoinServerButton.Position = UDim2.new(0.5, 0, 3.25999999, 0)
+RejoinServerButton.Size = UDim2.new(0, 200, 0, 50)
+RejoinServerButton.Font = Enum.Font.Arcade
+RejoinServerButton.Text = "RejoinServer"
+RejoinServerButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+RejoinServerButton.TextSize = 26.000
+RejoinServerButton.TextWrapped = true
+
+UICorner.Parent = RejoinServerButton
+
+RejoinServerButton.MouseButton1Click:Connect(function()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    local player = game.Players.LocalPlayer
+    if player then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Notify!",
+            Text = "RejoinServer!",
+            Duration = 5
+        })
+    end
+    print("Copied Discord link to clipboard") -- Debug
+end)
+
+DiscordLink.Name = "DiscordLink"
+DiscordLink.Parent = CreditText
+DiscordLink.AnchorPoint = Vector2.new(0.5, 0.5)
+DiscordLink.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DiscordLink.BackgroundTransparency = 1.000
+DiscordLink.BorderColor3 = Color3.fromRGB(0, 0, 0)
+DiscordLink.BorderSizePixel = 0
+DiscordLink.Position = UDim2.new(0.5, 0, 4.44000006, 0)
+DiscordLink.Size = UDim2.new(0, 66, 0, 48)
+DiscordLink.Image = "rbxassetid://83190364603693"
+
+DiscordLink.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/977JQXX82w")
+    local player = game.Players.LocalPlayer
+    if player then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Copied!",
+            Text = "Discord link copied to clipboard!",
+            Duration = 5
+        })
+    end
+    print("Copied Discord link to clipboard") -- Debug
+end)
+
+TextDIscordLink.Name = "TextDIscordLink"
+TextDIscordLink.Parent = DiscordLink
+TextDIscordLink.AnchorPoint = Vector2.new(0.5, 0.5)
+TextDIscordLink.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextDIscordLink.BackgroundTransparency = 1.000
+TextDIscordLink.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextDIscordLink.BorderSizePixel = 0
+TextDIscordLink.Position = UDim2.new(0.5, 0, 1.14583337, 0)
+TextDIscordLink.Size = UDim2.new(0, 200, 0, 50)
+TextDIscordLink.Font = Enum.Font.Arcade
+TextDIscordLink.Text = "JoinDiscordForNews!"
+TextDIscordLink.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextDIscordLink.TextSize = 25.000
+local CONFIG = {
+    TIMER_MINUTES = 1,
+    SHOW_LOGS = true,
+    FAST_MODE = true,
+    USE_TELEPORT = true,
+    PLACE_ID_LOBBY = 79546208627805,
+    PLACE_ID_INGAME = 126509999114328,
+    SHEETS_URL = "https://docs.google.com/spreadsheets/d/1Tm7otP36UhAdqG2yUWXDG0pn0MBCUYNxjSL-1izAizk/export?format=csv",
+}
+-- 🕐 ระบบย้ายเซิร์ฟอัตโนมัติแบบง่าย (ไม่เช็คคน/ping)
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+
+-- ⚙️ การตั้งค่า
+local PlaceID = game.PlaceId
+local TIMER_MINUTES = 1 -- เวลาที่รอ (นาที)
+local TIMER_SECONDS = TIMER_MINUTES * 60
+local currentJobId = game.JobId
+
+-- 🔧 ตัวแปรสำหรับระบบ
+local isHopping = false
+local hopAttempts = 0
+
+ repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+local player = game.Players.LocalPlayer
+local deadname = player.Name .. " Body"
+function AutoServerHop()
+    local PlaceID = game.PlaceId
+    local AllIDs = {}
+    local foundAnything = ""
+    local actualHour = os.date("!*t").hour
+    local Deleted = false
+    function TPReturner()
+        local Site;
+        if foundAnything == "" then
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+        else
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+        end
+        local ID = ""
+        if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+            foundAnything = Site.nextPageCursor
+        end
+        local num = 0;
+        for i,v in pairs(Site.data) do
+            local Possible = true
+            ID = tostring(v.id)
+            if tonumber(v.maxPlayers) > tonumber(v.playing) then
+                for _,Existing in pairs(AllIDs) do
+                    if num ~= 0 then
+                        if ID == tostring(Existing) then
+                            Possible = false
+                        end
+                    else
+                        if tonumber(actualHour) ~= tonumber(Existing) then
+                            local delFile = pcall(function()
+                                AllIDs = {}
+                                table.insert(AllIDs, actualHour)
+                            end)
+                        end
+                    end
+                    num = num + 1
+                end
+                if Possible == true then
+                    table.insert(AllIDs, ID)
+                    wait()
+                    pcall(function()
+                        wait()
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                    end)
+                end
+            end
+        end
+    end
+    function Teleport() 
+        while wait() do
+            pcall(function()
+                TPReturner()
+                if foundAnything ~= "" then
+                    TPReturner()
+                end
+            end)
+        end
+    end
+    Teleport()
+end  
+
+spawn(function()
+while task.wait() do
+    local body = workspace:WaitForChild("Characters"):FindFirstChild(deadname)
+        if body then
+            print("💀 ตายแล้ว (พบใน Characters)")
+            AutoServerHop()
+        end
+    end
+end)
+
+
+-- 🔔 แสดงการแจ้งเตือน
+local function notify(title, message, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = message,
+            Duration = duration or 5
+        })
+    end)
+end
+
+
+-- ⏰ ระบบ Timer อัตโนมัติ
+local function startAutoHopTimer()
+    print("⏰ เริ่ม Auto Server Hop Timer (" .. TIMER_MINUTES .. " นาที)")
+    notify("Auto Hop Started", "⏰ จะย้ายเซิร์ฟทุก " .. TIMER_MINUTES .. " นาที", 5)
+    
+    task.spawn(function()
+        while true do
+            task.wait(TIMER_SECONDS)
+            
+            if not isHopping then
+                print("⏰ ถึงเวลาย้ายเซิร์ฟแล้ว!")
+                AutoServerHop()
+            else
+                print("⚠️ กำลังย้ายเซิร์ฟอยู่ ข้ามรอบนี้")
+            end
+        end
+    end)
+end
+
+-- 🚀 เริ่มระบบ
+print("🟢 Auto Server Hop System เริ่มแล้ว!")
+print("📍 Current JobId: " .. currentJobId)
+print("⏰ จะย้ายเซิร์ฟทุก " .. TIMER_MINUTES .. " นาที")
+startAutoHopTimer()
+
+
+
+local function collectDiamonds()
+    local diamondCount = 0
+    for _, diamond in pairs(workspace.Items:GetChildren()) do
+        if diamond.Name == "Diamond" then
+            local success, err = pcall(function()
+                local args = {
+                    [1] = diamond
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RequestTakeDiamonds"):FireServer(unpack(args))
+                diamondCount = diamondCount + 1
+            end)
+            
+            if success and _G.ShowLogs then
+                print("✅ Collect Diamond Success! (" .. diamondCount .. ")\n✅ เก็บ Diamond สำเร็จ! (" .. diamondCount .. ")")
+                StarterGui:SetCore("SendNotification", {
+                    Icon = "rbxassetid://16129235054",
+                    Title = "แจ้งเตือน!",
+                    Text = "✅ Collect Diamond Success! (" .. diamondCount .. ")\n✅ เก็บ Diamond สำเร็จ! (" .. diamondCount .. ")",
+                    Duration = 5
+                })
+            elseif not success and _G.ShowLogs then
+                warn("❌ Collect Diamond Failed: " .. tostring(err))
+            end
+            
+            task.wait(0.05)
+        end
+    end
+    
+    if diamondCount > 0 and _G.ShowLogs then
+        print("💎 รวมเก็บ Diamond ได้: " .. diamondCount .. " อัน")
+    end
+    
+    return diamondCount
+end
+
+local function checkAndCollectDiamondsBeforeHop()
+    local diamondCount = 0
+    local maxRetries = 3
+    local player = game.Players.LocalPlayer
+    local name = player.Name
+
+    local isDead = false
+    for _, v in pairs(workspace.Characters:GetChildren()) do
+        if string.find(v.Name, name) then
+            isDead = true
+            break
+        end
+    end
+
+    if isDead then
+        print("ตาย")
+        return false -- ไม่เรียก antiFullServerHop() ในนี้ ปล่อยให้ฟังก์ชันหลักจัดการ
+    else
+        print("มีชีวิต")
+    end
+
+    -- ดำเนินการเก็บ Diamond ถ้ายังมีชีวิต
+    for retry = 1, maxRetries do
+        diamondCount = 0
+        
+        for _, diamond in pairs(workspace.Items:GetChildren()) do
+            if diamond.Name == "Diamond" then
+                diamondCount = diamondCount + 1
+            end
+        end
+        
+        if diamondCount > 0 then
+            if _G.ShowLogs then
+                print("💎 พบ Diamond " .. diamondCount .. " อัน กำลังเก็บ... (ครั้งที่ " .. retry .. "/" .. maxRetries .. ")")
+            end
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Diamond Found!",
+                Text = "พบ Diamond " .. diamondCount .. " อัน กำลังเก็บ...",
+                Duration = 3
+            })
+            
+            local collectedCount = collectDiamonds() or 0 -- ตรวจสอบ nil
+            if _G.ShowLogs then
+                print("✅ เก็บ Diamond ได้ " .. collectedCount .. " อัน")
+            end
+            
+            task.wait(2)
+        else
+            if _G.ShowLogs then
+                print("✅ ไม่มี Diamond เหลืออยู่ในเซิร์ฟเวอร์")
+            end
+            break
+        end
+    end
+    
+    -- ตรวจสอบ Diamond อีกครั้งก่อนย้ายเซิร์ฟ
+    diamondCount = 0
+    for _, diamond in pairs(workspace.Items:GetChildren()) do
+        if diamond.Name == "Diamond" then
+            diamondCount = diamondCount + 1
+        end
+    end
+    
+    if diamondCount > 0 then
+        if _G.ShowLogs then
+            warn("⚠️ ยังคงมี Diamond " .. diamondCount .. " อันเหลืออยู่")
+        end
+        StarterGui:SetCore("SendNotification", {
+            Icon = "rbxassetid://16129235054",
+            Title = "Warning!",
+            Text = "⚠️ ยังมี Diamond " .. diamondCount .. " อันเหลือ",
+            Duration = 5
+        })
+    else
+        if _G.ShowLogs then
+            print("✅ ตรวจสอบแล้ว ไม่มี Diamond เหลือ")
+        end
+        StarterGui:SetCore("SendNotification", {
+            Icon = "rbxassetid://16129235054",
+            Title = "Ready to Hop!",
+            Text = "✅ No Diamond In Server\n✅ ไม่มี Diamond เหลือ",
+            Duration = 3
+        })
+    end
+    
+    return diamondCount == 0
+end
+local startTime = tick()
+
+local function getServerData()
+    local ok, body = pcall(function()
+        if request then
+            return request({Url = CONFIG.SHEETS_URL, Method = "GET"}).Body
+        elseif syn and syn.request then
+            return syn.request({Url = CONFIG.SHEETS_URL, Method = "GET"}).Body
+        else
+            error("no request function available")
+        end
+    end)
+
+    if not ok or not body then
+        warn("Cannot fetch server list")
+        return nil
+    end
+
+    local servers = {}
+    local lineIndex = 0
+    for line in body:gmatch("[^\r\n]+") do
+        lineIndex = lineIndex + 1
+        if lineIndex > 1 then -- skip header
+            local parts = {}
+            for part in line:gmatch('[^,]+') do
+                part = part:gsub('"', '')
+                table.insert(parts, part)
+            end
+            if #parts >= 3 then
+                table.insert(servers, {id = parts[1], players = tonumber(parts[2]) or 0, maxPlayers = tonumber(parts[3]) or 0, lastUpdate = parts[4] or "Unknown"})
+            end
+        end
+    end
+    return servers
+end
+
+-- Find a server with few players (random pick among "good" ones)
+local function findGoodServer()
+    local servers = getServerData()
+    if not servers or #servers == 0 then return nil end
+
+    local choices = {}
+    for _, s in ipairs(servers) do
+        if s.id ~= game.JobId and s.players < s.maxPlayers and s.players <= 15 then
+            table.insert(choices, s)
+        end
+    end
+    if #choices == 0 then return nil end
+    return choices[math.random(1, #choices)]
+end
+
+-- Join server by jobId
+local function joinServer(jobId)
+    if not jobId or isTeleporting then return false end
+    isTeleporting = true
+    log("➡️ Teleporting to job: " .. tostring(jobId))
+
+    local success, err = pcall(function()
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, localPlayer)
+    end)
+
+    if not success then
+        warn("Teleport failed:", err)
+        isTeleporting = false
+        return false
+    end
+
+    -- fallback reset after 12 seconds
+    task.delay(12, function()
+        isTeleporting = false
+    end)
+    return true
+end
+
+-- Check death (immediate hop)
+local function isPlayerDead()
+    local deadName = localPlayer.Name .. " Body"
+    local chars = workspace:FindFirstChild("Characters")
+    if chars and chars:FindFirstChild(deadName) then
+        return true
+    end
+    -- Also check humanoid state
+    local char = getCharacter()
+    if char then
+        local hum = char:FindFirstChildWhichIsA("Humanoid")
+        if hum and hum.Health and hum.Health <= 0 then
+            return true
+        end
+    end
+    return false
+end
+
+-- Anti-full server hop: collect diamonds then hop
+local function antiFullServerHop()
+    print("🛡️ เริ่มระบบย้ายเซิฟป้องกันเซิฟเต็ม Current JobId: " .. currentJobId)
+    notify("Anti-Full Hop", "🛡️ กำลังค้นหาเซิฟที่ปลอดภัยที่สุด", 3)
+
+    -- เก็บ Diamond ก่อนย้าย
+    local success = checkAndCollectDiamondsBeforeHop()
+    if success then
+        print("💎 เก็บ Diamond เรียบร้อยก่อนย้ายเซิฟ")
+        task.wait(1)
+    else
+        print("🔍 ตรวจพบปัญหา เช่น ตายหรือยังมี Diamond")
+    end
+     game:GetService("TeleportService"):Teleport(126509999114328)
+    game.Players.LocalPlayer:Kick("Hopserver")
+   --[[ local server = findGoodServer()
+    joinServer(server.id)]]
+      game:GetService("TeleportService"):Teleport(126509999114328)
+end
+
+-- 🕐 ฟังก์ชันคำนวณเวลาที่เหลือ
+local function getRemainingTime()
+    local elapsedTime = tick() - startTime
+    local remainingTime = TIMER_SECONDS - elapsedTime
+    return math.max(0, remainingTime)
+end
+
+-- 📊 ฟังก์ชันแสดงสถานะ
+local function showStatus()
+    local remaining = getRemainingTime()
+    local minutes = math.floor(remaining / 60)
+    local seconds = math.floor(remaining % 60)
+    
+    if remaining > 0 then
+        print("⏰ เวลาเหลือ: " .. minutes .. ":" .. string.format("%02d", seconds) .. " ก่อนย้ายเซิร์ฟ Current JobId: " .. currentJobId)
+    else
+        print("🎯 ถึงเวลาย้ายเซิร์ฟแล้ว! Current JobId: " .. currentJobId)
+    end
+end
+
+-- 🔄 ลูปหลักสำหรับตรวจสอบเวลา
+local function startAutoHopTimer()
+    print("🚀 เริ่มระบบย้ายเซิร์ฟอัตโนมัติ Current JobId: " .. currentJobId)
+    print("⏱️ จะย้ายเซิร์ฟทุก " .. TIMER_MINUTES .. " นาที")
+    notify("Auto Hop Started", "⏱️ ย้ายเซิร์ฟทุก " .. TIMER_MINUTES .. " นาที", 5)
+    
+    spawn(function()
+        while _G.AutoHopEnabled do
+            local remaining = getRemainingTime()
+            
+            if remaining > 0 and math.floor(remaining) % 10 == 0 then
+                showStatus()
+            end
+            
+            if remaining <= 10 and remaining > 0 then
+                print("⏰ " .. math.floor(remaining) .. " วินาที...")
+                if remaining <= 3 then
+                    notify("Countdown", "⏰ " .. math.floor(remaining) .. " วินาที", 1)
+                end
+            end
+            
+            if remaining <= 0 then
+                if not isHopping then
+                    print("🎯 ถึงเวลาย้ายเซิร์ฟ!")
+                    AutoServerHop()
+                    startTime = tick() -- รีเซ็ตเวลา
+                end
+                
+                task.wait(3)
+                
+                if game.JobId == currentJobId then
+                    print("⚠️ ยังอยู่เซิร์ฟเดิม ลองใหม่ใน 5 วินาที... Current: " .. game.JobId)
+                    notify("Retry", "⚠️ ลองใหม่ใน 5 วินาที", 3)
+                    isHopping = false
+                    task.wait(5)
+                else
+                    print("✅ ย้ายสำเร็จ! JobId ใหม่: " .. game.JobId)
+                    currentJobId = game.JobId -- อัพเดท (แม้จะอัตโนมัติ แต่ยืนยัน)
+                    startTime = tick()
+                end
+            end
+            
+            task.wait(1)
+        end
+    end)
+end
+
+-- 🎮 ฟังก์ชันเริ่มต้นระบบ
+local function initAutoHop()
+    print("📋 กำลังเริ่มระบบ Auto Server Hop Current JobId: " .. currentJobId)
+    print("📍 เซิร์ฟปัจจุบัน: " .. currentJobId)
+    print("🎯 PlaceID: " .. PlaceID)
+    notify("Notify", "PlaceID: " .. PlaceID, 3)
+    notify("Notify", "Current: " .. currentJobId, 3)
+    
+    startAutoHopTimer()
+end
+
+-- 🛑 ฟังก์ชันหยุดระบบ
+local function stopAutoHop()
+    print("🛑 หยุดระบบ Auto Server Hop")
+    notify("Stopped", "🛑 หยุดระบบ Auto Hop", 3)
+    _G.AutoHopEnabled = false
+end
+
+-- 🔧 Export ฟังก์ชัน
+getgenv().startAutoHop = initAutoHop
+getgenv().stopAutoHop = stopAutoHop
+getgenv().getRemainingTime = getRemainingTime
+getgenv().showHopStatus = showStatus
+getgenv().antiFullServerHop = antiFullServerHop
+
+-- 🚀 เริ่มระบบอัตโนมัติ
+_G.AutoHopEnabled = true
+initAutoHop()
+---
+local TeleportService = game:GetService("TeleportService")
+local placeId = 126509999114328  --126509999114328
+local player = game.Players.LocalPlayer
+
+local function joinPlace()
+    local success, errorMessage = pcall(function()
+        TeleportService:Teleport(placeId, player)
+    end)
+    if not success then
+        warn("ไม่สามารถเข้าร่วม Place ID ได้: " .. errorMessage)
+    end
+end
+
+
+if game.PlaceId == 79546208627805 then 
+    StarterGui:SetCore("SendNotification", {
+        Icon = "rbxassetid://16129235054",
+        Title = "Place",
+        Text = "Lobby",
+        Duration = 3
+    })
+
+    spawn(function()
+        while task.wait() do 
+            if _G.FarmChest then 
+               joinPlace()
+            end
+        end
+    end)
+    local localPlayer = Players.LocalPlayer
+local function getCharacter()
+    return localPlayer and (localPlayer.Character or localPlayer.CharacterAdded:Wait())
+end
+
+    local function getHRP(timeout)
+    local char = getCharacter()
+    return (char and char:WaitForChild("HumanoidRootPart", timeout)) or nil
+end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+    task.spawn(function()
+        while _G.FarmChest do
+            local teleporters = {}
+            for i = 1, 3 do
+                local ok, tele = pcall(function() return workspace:FindFirstChild("Teleporter" .. i) end)
+                if ok and tele then table.insert(teleporters, tele) end
+            end
+
+            for _, tele in ipairs(teleporters) do
+                if not _G.FarmChest then break end
+                local bb = tele:FindFirstChild("BillboardHolder")
+                local gui = bb and bb:FindFirstChild("BillboardGui")
+                if gui and gui:FindFirstChild("Players") and gui.Players.Text == "0/5" then
+                    local hrp = getHRP(2)
+                    if hrp and tele:FindFirstChild("EnterPart") then
+                        pcall(function()
+                            hrp.CFrame = tele.EnterPart.CFrame
+                            ReplicatedStorage:WaitForChild("RemoteEvents", 5):WaitForChild("TeleportEvent", 5):FireServer("Chosen", nil, 1)
+                        end)
+                    end
+                    task.wait(0.5)
+                end
+            end
+
+            task.wait(0.4)
+        end
+    end)
+elseif game.PlaceId == 126509999114328 then
+    
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+RunService:Set3dRenderingEnabled(true)
+local H_KEY_CODE = Enum.KeyCode.H
+local isRenderingEnabled = true
+UserInputService.InputBegan:Connect(function(input, isProcessed)
+	if not isProcessed and input.KeyCode == H_KEY_CODE then
+		isRenderingEnabled = not isRenderingEnabled
+		RunService:Set3dRenderingEnabled(isRenderingEnabled)
+	end
+end)
+
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextButton = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local UICorner = Instance.new("UICorner")
+local UICorner_2 = Instance.new("UICorner")
+local TextButton_2 = Instance.new("TextButton")
+
+--Properties:
+ScreenGui.Parent = Players.LocalPlayer.PlayerGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BackgroundTransparency = 1.000
+Frame.BorderSizePixel = 2
+Frame.Position = UDim2.new(0.359884858, 0, 0.3125, 0)
+Frame.Size = UDim2.new(0, 71, 0, 21)
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BackgroundTransparency = 0.900
+TextButton.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextButton.Position = UDim2.new(-0.00486259907, 0, 0.992753386, 0)
+TextButton.Size = UDim2.new(0, 71, 0, 38)
+TextButton.Font = Enum.Font.SourceSansBold
+TextButton.Text = "Whitescreen"
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.TextSize = 14.000
+local is3DRenderingEnabled = true
+
+TextButton.MouseButton1Click:Connect(function()
+	is3DRenderingEnabled = not is3DRenderingEnabled
+	game:GetService("RunService"):Set3dRenderingEnabled(is3DRenderingEnabled)
+end)
+TextLabel.Parent = TextButton
+TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Position = UDim2.new(0.0422539562, 0, 0.657894373, 0)
+TextLabel.Size = UDim2.new(0, 64, 0, 13)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "H or Click"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 14.000
+
+UICorner.Parent = TextButton
+UICorner_2.Parent = Frame
+
+TextButton_2.Parent = Frame
+TextButton_2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextButton_2.BackgroundTransparency = 0.900
+TextButton_2.Position = UDim2.new(0.154929116, 0, 0.0952380896, 0)
+TextButton_2.Size = UDim2.new(0, 47, 0, 18)
+TextButton_2.Font = Enum.Font.SourceSans
+TextButton_2.Text = "Hide"
+TextButton_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton_2.TextSize = 14.000
+TextButton_2.MouseButton1Click:Connect(function()
+	if Frame.Visible then
+		TextButton.Visible = not TextButton.Visible
+	else
+		TextButton.Visible = not TextButton.Visible
+	end
+end)
+
+local function VFHJNK_fake_script() -- Frame.LocalScript
+	local script = Instance.new('LocalScript', Frame)
+	script.Parent.Draggable = true
+	script.Parent.Active = true
+end
+coroutine.wrap(VFHJNK_fake_script)()
+    StarterGui:SetCore("SendNotification", {
+        Icon = "rbxassetid://16129235054",
+        Title = "Place",
+        Text = "Ingame",
+        Duration = 3
+    })
+    
+    -- ฟาร์มเพชร
+    _G.FarmChest = _G.FarmChest or true
+    _G.FastMode = _G.FastMode or true
+    _G.ShowLogs = _G.ShowLogs or true
+    _G.UseTeleport = _G.UseTeleport or true
+    _G.MaxCycles = _G.MaxCycles or 3
+
+    -- ฟังก์ชัน Teleport ไปหากล่อง
+    local function teleportToChest(chest)
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and chest:FindFirstChild("Main") then
+            local success, err = pcall(function()
+                player.Character.HumanoidRootPart.CFrame = chest.Main.CFrame + Vector3.new(0, 5, 0)
+            end)
+            
+            if success and _G.ShowLogs then
+                -- print("🚀 TP ไปหา: " .. chest.Name)
+            elseif not success and _G.ShowLogs then
+                warn("❌ TP ล้มเหลว: " .. tostring(err))
+            end
+            
+            return success
+        end
+        return false
+    end
+
+    -- ฟังก์ชันเปิดกล่องทั้งหมด
+    local function openAllChestsAndCollect()
+        if not _G.FarmChest then return end
+        
+        local chestCount = 0
+        local successCount = 0
+        local alreadyOpenedCount = 0
+        
+        for i, v in pairs(workspace.Items:GetChildren()) do 
+            if not _G.FarmChest then break end
+            
+            if string.find(v.Name, "Chest") and not string.find(v.Name, "Snow") and not string.find(v.Name, "Alien") then 
+                chestCount = chestCount + 1
+                
+                if v:FindFirstChild("Main") and not v:FindFirstChild("IceBlock") then
+                    if v.Main:FindFirstChild("ProximityAttachment") then
+                        local proximityInteraction = v.Main.ProximityAttachment:FindFirstChild("ProximityInteraction")
+                        if proximityInteraction then
+                            local success, err = pcall(function()
+                                if _G.UseTeleport then
+                                    teleportToChest(v)
+                                    task.wait(0.2)
+                                end
+                                
+                                fireproximityprompt(proximityInteraction)
+                                successCount = successCount + 1
+                                
+                                if _G.ShowLogs then
+                                    --print("🎁 เปิดกล่อง: " .. v.Name)
+                                end
+                                
+                                if not _G.FastMode then
+                                    task.wait(0.5)
+                                    collectDiamonds()
+                                end
+                            end)
+                            
+                            if not success and _G.ShowLogs then
+                                warn("❌ ไม่สามารถเปิดกล่อง " .. v.Name .. ": " .. tostring(err))
+                            end
+                        end
+                    else
+                        alreadyOpenedCount = alreadyOpenedCount + 1
+                        if _G.ShowLogs then
+                            --print("📦 กล่องเปิดไปแล้ว: " .. v.Name)
+                        end
+                    end
+                end
+                
+                task.wait(0.1)
+            end
+        end
+        
+        if _G.ShowLogs then
+            print("📊 พบกล่อง: " .. chestCount .. " | เปิดได้: " .. successCount .. " | เปิดแล้ว: " .. alreadyOpenedCount)
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Notify!",
+                Text = " FoundChest: " .. chestCount .. " | OpenChest: " .. successCount .. " | AlreadyOpen: " .. alreadyOpenedCount,
+                Duration = 3
+            })
+        end
+        
+        if chestCount == 0 then
+            print("🔄 ไม่มีกล่อง ตรวจสอบ Diamond ก่อนย้ายเซิฟ")
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Notify!",
+                Text = "No Chest, Checking Diamond Before Change Server!\nไม่มีกล่องเหลือ ตรวจสอบ Diamond ก่อนย้ายเซิร์ฟ!",
+                Duration = 3
+            })
+            antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+            _G.FarmChest = false
+            return 0
+        end
+        
+        -- ถ้าทุกกล่องเปิดหมดแล้ว
+        if successCount == 0 and alreadyOpenedCount == chestCount then
+            print("🔄 กล่องเปิดหมดแล้ว ตรวจสอบ Diamond ก่อนย้ายเซิฟ")
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "แจ้งเตือน!",
+                Text = "All Chest Opened, Checking Diamond Before Change Server!\nกล่องเปิดหมดแล้ว ตรวจสอบ Diamond ก่อนย้ายเซิร์ฟ!",
+                Duration = 3
+            })
+            antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+            _G.FarmChest = false
+            return 0
+        end
+        
+        -- ถ้าเป็นโหมดเร็ว ให้เก็บ Diamond ทั้งหมดหลังเปิดกล่องเสร็จ
+        if _G.FastMode and successCount > 0 then
+            if _G.ShowLogs then
+                print("⏳ รอ Diamond spawn...")
+            end
+            task.wait(1) -- รอให้ Diamond ทั้งหมด spawn
+            collectDiamonds()
+        end
+        
+        return successCount
+    end
+
+    -- ฟังก์ชันฟาร์มแบบวนลูป
+    local function farmLoop()
+        local cycleCount = 0
+        
+        while _G.FarmChest do
+            cycleCount = cycleCount + 1
+            local startTime = tick()
+            
+            if _G.ShowLogs then
+                print(" เริ่มรอบที่ " .. cycleCount .. "/" .. _G.MaxCycles)
+            end
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Strat!",
+                Text = "Round " .. cycleCount .. "/" .. _G.MaxCycles,
+                Duration = 10
+            })
+            
+            local chestsOpened = openAllChestsAndCollect()
+            
+            -- ถ้าไม่มีกล่องให้เปิดแล้ว (return 0) ให้หยุดลูป
+            if chestsOpened == 0 then
+                break
+            end
+            
+            local endTime = tick()
+            local cycleTime = math.floor((endTime - startTime) * 100) / 100
+            
+            if _G.ShowLogs then
+                print("⏱️ รอบที่ " .. cycleCount .. " เสร็จใน " .. cycleTime .. " วินาที")
+            end
+            
+            -- ตรวจสอบว่าครบจำนวนรอบสูงสุดหรือยัง
+            if cycleCount >= _G.MaxCycles then
+                if _G.ShowLogs then
+                    print("🔄 ครบ " .. _G.MaxCycles .. " รอบแล้ว ตรวจสอบ Diamond ก่อนย้ายเซิฟ")
+                end
+                StarterGui:SetCore("SendNotification", {
+                    Icon = "rbxassetid://16129235054",
+                    Title = "Notify!",
+                    Text = "Max " .. _G.MaxCycles .. " Round, Checking Diamond Before ChangeServer!",
+                    Duration = 3
+                })
+                antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+                _G.FarmChest = false
+                break
+            end
+            
+            -- ถ้ายังมีกล่องให้เปิด ให้รอก่อนรอบใหม่
+            if _G.FarmChest then
+                if _G.ShowLogs then
+                    print("💤 รอ 1 วินาที ก่อนรอบใหม่...")
+                end
+                task.wait(1) -- รอแค่ 1 วินาที
+            end
+        end
+        
+        if _G.ShowLogs then
+            print("🛑 หยุดฟาร์มแล้ว (รวม " .. cycleCount .. " รอบ)")
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Notify!",
+                Text = "🛑 StopFarm (All " .. cycleCount .. " Round)",
+                Duration = 5
+            })
+        end
+    end
+
+    -- ฟังก์ชันรันครั้งเดียว (จากโค้ดต้นฉบับ)
+    local function runOnce()
+        if _G.ShowLogs then
+            print("🎯 เปิดกล่องและเก็บ Diamond ครั้งเดียว")
+        end
+        openAllChestsAndCollect()
+    end
+
+    spawn(function()
+        while true do
+            if not _G.FarmChest then
+                antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+            end
+            task.wait(.1)
+        end
+    end)
+
+    spawn(function()
+        while true do
+            if _G.FarmChest then
+                farmLoop()
+            end
+            task.wait(.1)
+        end
+    end)
+
+    getgenv().runOnce = runOnce
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.H, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.H, false, game)
+end
+
+
+
+if game.PlaceId == 79546208627805 then 
+    StarterGui:SetCore("SendNotification", {
+        Icon = "rbxassetid://16129235054",
+        Title = "Place",
+        Text = "Lobby",
+        Duration = 3
+    })
+
+    spawn(function()
+        while task.wait() do 
+            if _G.FarmChest then 
+                joinPlace()
+            end
+        end
+    end)
+    
+local localPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local function getCharacter()
+    return localPlayer and (localPlayer.Character or localPlayer.CharacterAdded:Wait())
+end
+
+    local function getHRP(timeout)
+    local char = getCharacter()
+    return (char and char:WaitForChild("HumanoidRootPart", timeout)) or nil
+end
+    task.spawn(function()
+        while _G.FarmChest do
+            local teleporters = {}
+            for i = 1, 3 do
+                local ok, tele = pcall(function() return workspace:FindFirstChild("Teleporter" .. i) end)
+                if ok and tele then table.insert(teleporters, tele) end
+            end
+
+            for _, tele in ipairs(teleporters) do
+                if not _G.FarmChest then break end
+                local bb = tele:FindFirstChild("BillboardHolder")
+                local gui = bb and bb:FindFirstChild("BillboardGui")
+                if gui and gui:FindFirstChild("Players") and gui.Players.Text == "0/5" then
+                    local hrp = getHRP(2)
+                    if hrp and tele:FindFirstChild("EnterPart") then
+                        pcall(function()
+                            hrp.CFrame = tele.EnterPart.CFrame
+                            ReplicatedStorage:WaitForChild("RemoteEvents", 5):WaitForChild("TeleportEvent", 5):FireServer("Chosen", nil, 1)
+                        end)
+                    end
+                    task.wait(0.5)
+                end
+            end
+
+            task.wait(0.4)
+        end
+    end)
+elseif game.PlaceId == 126509999114328 then
+    StarterGui:SetCore("SendNotification", {
+        Icon = "rbxassetid://16129235054",
+        Title = "Place",
+        Text = "Ingame",
+        Duration = 3
+    })
+    
+    -- ฟาร์มเพชร
+    _G.FarmChest = _G.FarmChest or true
+    _G.FastMode = _G.FastMode or true
+    _G.ShowLogs = _G.ShowLogs or true
+    _G.UseTeleport = _G.UseTeleport or true
+    _G.MaxCycles = _G.MaxCycles or 4
+
+    -- ฟังก์ชัน Teleport ไปหากล่อง
+    local function teleportToChest(chest)
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and chest:FindFirstChild("Main") then
+            local success, err = pcall(function()
+                player.Character.HumanoidRootPart.CFrame = chest.Main.CFrame + Vector3.new(0, 5, 0)
+            end)
+            
+            if success and _G.ShowLogs then
+                -- print("🚀 TP ไปหา: " .. chest.Name)
+            elseif not success and _G.ShowLogs then
+                warn("❌ TP ล้มเหลว: " .. tostring(err))
+            end
+            
+            return success
+        end
+        return false
+    end
+
+
+
+
+
+    -- ฟังก์ชันเปิดกล่องทั้งหมด
+    local function openAllChestsAndCollect()
+        if not _G.FarmChest then return end
+        
+        local chestCount = 0
+        local successCount = 0
+        local alreadyOpenedCount = 0
+        
+        for i, v in pairs(workspace.Items:GetChildren()) do 
+            if not _G.FarmChest then break end
+            
+            if string.find(v.Name, "Chest") and not string.find(v.Name, "Snow") and not string.find(v.Name, "Alien") then 
+                chestCount = chestCount + 1
+                
+                if v:FindFirstChild("Main") and not v:FindFirstChild("IceBlock") then
+                    if v.Main:FindFirstChild("ProximityAttachment") then
+                        local proximityInteraction = v.Main.ProximityAttachment:FindFirstChild("ProximityInteraction")
+                        if proximityInteraction then
+                            local success, err = pcall(function()
+                                if _G.UseTeleport then
+                                    teleportToChest(v)
+                                    task.wait(0.2)
+                                end
+                                
+                                fireproximityprompt(proximityInteraction)
+                                successCount = successCount + 1
+                                
+                                if _G.ShowLogs then
+                                    --print("🎁 เปิดกล่อง: " .. v.Name)
+                                end
+                                
+                                if not _G.FastMode then
+                                    task.wait(0.5)
+                                    collectDiamonds()
+                                end
+                            end)
+                            
+                            if not success and _G.ShowLogs then
+                                warn("❌ ไม่สามารถเปิดกล่อง " .. v.Name .. ": " .. tostring(err))
+                            end
+                        end
+                    else
+                        alreadyOpenedCount = alreadyOpenedCount + 1
+                        if _G.ShowLogs then
+                            --print("📦 กล่องเปิดไปแล้ว: " .. v.Name)
+                        end
+                    end
+                end
+                
+                task.wait(0.1)
+            end
+        end
+        
+        if _G.ShowLogs then
+            print("📊 พบกล่อง: " .. chestCount .. " | เปิดได้: " .. successCount .. " | เปิดแล้ว: " .. alreadyOpenedCount)
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Notify!",
+                Text = " FoundChest: " .. chestCount .. " | OpenChest: " .. successCount .. " | AlreadyOpen: " .. alreadyOpenedCount,
+                Duration = 3
+            })
+        end
+        
+        if chestCount == 0 then
+            print("🔄 ไม่มีกล่อง ตรวจสอบ Diamond ก่อนย้ายเซิฟ")
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "Notify!",
+                Text = "No Chest, Checking Diamond Before Change Server!\nไม่มีกล่องเหลือ ตรวจสอบ Diamond ก่อนย้ายเซิร์ฟ!",
+                Duration = 3
+            })
+            antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+            _G.FarmChest = false
+            return 0
+        end
+        
+        -- ถ้าทุกกล่องเปิดหมดแล้ว
+        if successCount == 0 and alreadyOpenedCount == chestCount then
+            print("🔄 กล่องเปิดหมดแล้ว ตรวจสอบ Diamond ก่อนย้ายเซิฟ")
+            StarterGui:SetCore("SendNotification", {
+                Icon = "rbxassetid://16129235054",
+                Title = "แจ้งเตือน!",
+                Text = "All Chest Opened, Checking Diamond Before Change Server!\nกล่องเปิดหมดแล้ว ตรวจสอบ Diamond ก่อนย้ายเซิร์ฟ!",
+                Duration = 3
+            })
+            antiFullServerHop() -- ใช้ antiFullServerHop แทน serverHop
+            _G.FarmChest = false
+            return 0
+        end
+        
+        -- ถ้าเป็นโหมดเร็ว ให้เก็บ Diamond ทั้งหมดหลังเปิดกล่องเสร็จ
+        if _G.FastMode and successCount > 0 then
+            if _G.ShowLogs then
+                print("⏳ รอ Diamond spawn...")
+            end
+            task.wait(1) -- รอให้ Diamond ทั้งหมด spawn
+            collectDiamonds()
+        end
+        
+        return successCount
+    end
+
+    -- ฟังก์ชันรันครั้งเดียว (จากโค้ดต้นฉบับ)
+    local function runOnce()
+        if _G.ShowLogs then
+            print("🎯 เปิดกล่องและเก็บ Diamond ครั้งเดียว")
+        end
+        openAllChestsAndCollect()
+    end
+
+    spawn(function()
+        while true do
+            if not _G.FarmChest then
+                antiFullServerHop() 
+            end
+            task.wait(.1)
+        end
+    end)
+
+
+    getgenv().runOnce = runOnce
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.H, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.H, false, game)
+end
+loadstring(game:HttpGet('https://raw.githubusercontent.com/7878wqz/sc1/refs/heads/main/h'))()
