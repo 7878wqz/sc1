@@ -571,6 +571,19 @@ local function isPlayerDead()
     return false
 end
 
+local Player = game.Players.LocalPlayer    
+local Http = game:GetService("HttpService")
+local TPS = game:GetService("TeleportService")
+local Api = "https://games.roblox.com/v1/games/"
+
+local _place,_id = game.PlaceId, game.JobId
+-- Asc for lowest player count, Desc for highest player count
+local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+function ListServers(cursor)
+   local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+   return Http:JSONDecode(Raw)
+end
+
 -- Anti-full server hop: collect diamonds then hop
 local function antiFullServerHop()
     print("🛡️ เริ่มระบบย้ายเซิฟป้องกันเซิฟเต็ม Current JobId: " .. currentJobId)
@@ -584,7 +597,12 @@ local function antiFullServerHop()
     else
         print("🔍 ตรวจพบปัญหา เช่น ตายหรือยังมี Diamond")
     end
-     game:GetService("TeleportService"):Teleport(126509999114328)
+    Player.Character.HumanoidRootPart.Anchored = true
+   local Servers = ListServers()
+   local Server = Servers.data[math.random(1,#Servers.data)]
+   TPS:TeleportToPlaceInstance(_place, Server.id, Player)
+   wait(3)
+    game:GetService("TeleportService"):Teleport(126509999114328)
     game.Players.LocalPlayer:Kick("Hopserver")
    --[[ local server = findGoodServer()
     joinServer(server.id)]]
@@ -1160,9 +1178,6 @@ elseif game.PlaceId == 126509999114328 then
         end
         return false
     end
-
-
-
 
 
     -- ฟังก์ชันเปิดกล่องทั้งหมด
