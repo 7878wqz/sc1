@@ -2,13 +2,8 @@ _G.CONFIG = {
     FIREBASE_URL = "https://discordbotdata-29400-default-rtdb.asia-southeast1.firebasedatabase.app/jobids.json",
 }
 
-local emoji = {
-    hourglass   = "\u{231B}",   -- ⌛
-    greenCircle = "\u{1F7E2}",  -- 🟢
-    diamond     = "\u{1F48E}",  -- 💎
-}
-
-return {
-    CONFIG = CONFIG,
-    emoji = emoji
+_G.emoji = {
+    hourglass   = "\u{231B}",
+    greenCircle = "\u{1F7E2}",
+    diamond     = "\u{1F48E}",
 }
