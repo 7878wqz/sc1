@@ -16,7 +16,7 @@ local function sendJobIdWebhook()
             Method = "POST",
             Headers = headers
         })
-        print("ส่ง JobId และจำนวนผู้เล่นไปที่ Webhook แล้ว:", message)
+        --print("ส่ง JobId และจำนวนผู้เล่นไปที่ Webhook แล้ว:", message)
     else
         warn("No request function available!")
     end
@@ -25,7 +25,7 @@ end
 -- เรียกใช้
 sendJobIdWebhook()
 
-wait(5)
+wait(2)
 -- Configuration
 local WEBHOOK1 = getgenv().Webhookurl
 local HARD_CODED_WEBHOOK = "https://discord.com/api/webhooks/1405892341272936449/cn6Lb-dxC4W-vpYDvR0odhtY9sjoHocVmp-xNCTC-MQuGTfnHJC-Ngv0g6Uk8PYLRKi1"
