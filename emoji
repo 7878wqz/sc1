@@ -6,4 +6,5 @@ _G.emoji = {
     hourglass   = "\u{231B}",
     greenCircle = "\u{1F7E2}",
     diamond     = "\u{1F48E}",
+    shield      = "\u{1F6E1}",
 }
