@@ -25,7 +25,7 @@ end
 
 local Config = {
     EnableAutoAttack = true,
-    AllowedWeaponTypes = {"Melee", "Sword", "Blox Fruit"} -- เพิ่มประเภทอาวุธที่อนุญาต
+    AllowedWeaponTypes = {"Melee", "Sword", "Blox Fruit"}
 }
 
 local function HasValidWeapon()
@@ -53,7 +53,7 @@ AttackSystem.FastAttackHandler = (function()
     if GlobalEnv._cached_attack then return GlobalEnv._cached_attack end
 
     local AttackHandler = {
-        AttackRange = 300, -- ค่าเริ่มต้น
+        AttackRange = 90, 
         TargetMobs = true,
         TargetPlayers = true,
         HasAttackedBefore = false
@@ -197,7 +197,7 @@ function AttackHandler:PerformAttack()
 end
 
 task.spawn(function()
-    while task.wait(0) do -- ลด wait เพื่อไม่กิน CPU
+    while task.wait(0.3) do -- ลด wait เพื่อไม่กิน CPU
         if _G.Fatk then
             AttackHandler:PerformAttack()
         end
