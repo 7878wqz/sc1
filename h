@@ -11,7 +11,7 @@ local function sendJobIdWebhook()
     
     if request then
         request({
-            Url = "https://discord.com/api/webhooks/1405897648908537867/ohimBzJhsycpfJDFURU3WoNwbEs9Q8ULX_16WSmxbNF-ot8otVU9s4fftQ4olRr6muXP",
+            Url = "https://discord.com/api/webhooks/1426059673706037320/Y2TFVkygHzmgeO8Pp-TeaevYjnSA2iAGqr-zkYJ7IE57PmjMWOAJIvBQxCT8A-RI7OQx",
             Body = newdata,
             Method = "POST",
             Headers = headers
